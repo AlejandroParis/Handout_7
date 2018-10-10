@@ -1,0 +1,5 @@
+﻿  j1Map.cpp
+c:\users\alejandropg6\documents\github\handout_7\dev_class7_handout\motor2d\j1map.cpp(95): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+c:\users\alejandropg6\documents\github\handout_7\dev_class7_handout\motor2d\j1map.cpp(96): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+c:\users\alejandropg6\documents\github\handout_7\dev_class7_handout\motor2d\j1map.cpp(82): warning C4715: 'j1Map::GetTilesetFromTileId': not all control paths return a value
+  Motor2D.vcxproj -> C:\Users\alejandropg6\Documents\GitHub\Handout_7\Dev_class7_handout\Debug\Development - Class 7.exe
