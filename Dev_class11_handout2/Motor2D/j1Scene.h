@@ -6,6 +6,8 @@
 struct SDL_Texture;
 class j1UIImage;
 class j1UILabel;
+class j1UIElement;
+class j1UIButton;
 
 class j1Scene : public j1Module
 {
@@ -34,10 +36,16 @@ public:
 	// Called before quitting
 	bool CleanUp();
 
+	bool OnMouseClick(j1UIElement* element);
+	bool OnMouseHover(j1UIElement* element);
+	bool OnMouseRelease(j1UIElement* element);
+	bool OnMouseExit(j1UIElement* element);
+
 private:
 	SDL_Texture* debug_tex;
 	j1UIImage* banner;
 	j1UILabel* text;
+	j1UIButton* button;
 };
 
 #endif // __j1SCENE_H__

@@ -10,17 +10,34 @@ class _TTF_Font;
 class j1UIElement
 {
 public:
-	iPoint position;
-	SDL_Rect rect;
+	SDL_Rect rect_box;
+	SDL_Rect rect_sprite;
+	bool hovered = false;
+	bool interactable = false;
+	j1Scene* scene;
 	j1UIElement();
 	~j1UIElement();
 	virtual bool UIBlit();
 	virtual bool UICleanUp();
+	virtual bool IsInside(int x, int y);
 };
+
+class j1UIInteractable : public j1UIElement
+{
+public:
+	SDL_Rect* anim;
+
+	virtual void OnMouseClick() {};
+	virtual void OnMouseHover() {};
+	virtual void OnMouseRelease() {};
+	virtual void OnMouseExit() {};
+};
+
 class j1UIImage : public j1UIElement
 {
 public:
-	j1UIImage(iPoint pos,SDL_Rect rect);
+
+	j1UIImage(iPoint pos, SDL_Rect rect);
 	~j1UIImage();
 	bool UIBlit();
 };
@@ -33,6 +50,20 @@ public:
 	j1UILabel(iPoint pos, _TTF_Font* font, p2SString text, SDL_Color color);
 	~j1UILabel();
 	bool UIBlit();
+	void SetText(p2SString text);
+};
+class j1UIButton : public j1UIInteractable
+{
+public:
+	//j1UILabel label;
+	j1UIButton(iPoint pos);
+	~j1UIButton();
+
+	bool UIBlit();
+	void OnMouseClick();
+	void OnMouseHover();
+	void OnMouseRelease();
+	void OnMouseExit();
 };
 // ---------------------------------------------------
 class j1Gui : public j1Module
@@ -61,8 +92,9 @@ public:
 
 	// TODO 2: Create the factory methods
 	// Gui creation functions
-	j1UIImage* CreateImage(iPoint pos, SDL_Rect rect);
-	j1UILabel* CreateLabel(iPoint pos, p2SString path, int size, p2SString text, SDL_Color color);
+	j1UIImage* CreateImage(iPoint pos, SDL_Rect rect, j1Scene* scene);
+	j1UILabel* CreateLabel(iPoint pos, p2SString path, int size, p2SString text, SDL_Color color, j1Scene* scene);
+	j1UIButton* CreateButton(iPoint pos, j1Scene* scene);
 	
 
 	SDL_Texture* GetAtlas() const;

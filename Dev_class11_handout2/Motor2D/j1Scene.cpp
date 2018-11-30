@@ -45,8 +45,9 @@ bool j1Scene::Start()
 	debug_tex = App->tex->Load("maps/path2.png");
 
 	// TODO 3: Create the banner (rect {485, 829, 328, 103}) and the text "Hello World"
-	banner = App->gui->CreateImage({ 300,300 }, { 485, 829, 328, 103 });
-	text = App->gui->CreateLabel({ 418, 260 }, "fonts/open_sans/OpenSans-Regular.ttf", 18, "Hello World", { 255,255,255 });
+	banner = App->gui->CreateImage({ 300,300 }, { 485, 829, 328, 103 },this);
+	button = App->gui->CreateButton({ 400,600 }, this);
+	text = App->gui->CreateLabel({ 418, 260 }, "fonts/open_sans/OpenSans-Regular.ttf", 18, "Hello World", { 255,255,255 },this);
 
 	return true;
 }
@@ -154,5 +155,33 @@ bool j1Scene::CleanUp()
 {
 	LOG("Freeing scene");
 
+	return true;
+}
+
+bool j1Scene::OnMouseClick(j1UIElement * element)
+{
+	return true;
+}
+
+bool j1Scene::OnMouseHover(j1UIElement * element)
+{
+	if (element == text)
+	{
+		text->SetText("On Hover!");
+	}
+	return true;
+}
+
+bool j1Scene::OnMouseRelease(j1UIElement * element)
+{
+	return true;
+}
+
+bool j1Scene::OnMouseExit(j1UIElement * element)
+{
+	if (element == text)
+	{
+		text->SetText("Hello world!");
+	}
 	return true;
 }
