@@ -46,9 +46,18 @@ bool j1Gui::PreUpdate()
 		j1UIElement* current_element = item->data;
 		if (current_element->IsInside(x, y))
 		{
-			if (current_element->interactable) ((j1UIInteractable*)current_element)->OnMouseHover();
-			current_element->scene->OnMouseHover(item->data);
-			current_element->hovered = true;
+			if (!current_element->hovered) 
+			{
+				if (current_element->interactable) ((j1UIInteractable*)current_element)->OnMouseHover();
+				current_element->scene->OnMouseHover(item->data);
+				current_element->hovered = true;
+			}
+			else if(App->input->GetMouseButtonDown(SDL_BUTTON_LEFT))
+			{
+				if (current_element->interactable) ((j1UIInteractable*)current_element)->OnMouseClick();
+				current_element->scene->OnMouseClick(item->data);
+
+			}
 		}
 		else if(current_element->hovered)
 		{
@@ -194,6 +203,7 @@ bool j1UIButton::UIBlit()
 
 void j1UIButton::OnMouseClick()
 {
+	rect_sprite = anim[2];
 }
 
 void j1UIButton::OnMouseHover()
@@ -203,6 +213,7 @@ void j1UIButton::OnMouseHover()
 
 void j1UIButton::OnMouseRelease()
 {
+	rect_sprite = anim[1];
 }
 
 void j1UIButton::OnMouseExit()
