@@ -1,4 +1,6 @@
-﻿  j1Gui.cpp
-c:\users\alejandropg6\documents\github\handout_7\dev_class11_handout2\motor2d\j1gui.h(8): warning C4099: '_TTF_Font': type name first seen using 'struct' now seen using 'class'
-  c:\users\alejandropg6\documents\github\handout_7\dev_class11_handout2\motor2d\j1fonts.h(11): note: see declaration of '_TTF_Font'
-  Motor2D.vcxproj -> C:\Users\alejandropg6\Documents\GitHub\Handout_7\Dev_class11_handout2\Debug\Development - Class 11 Handout2.exe
+﻿  j1Scene.cpp
+d:\downloads\handout_7\dev_class11_handout2\motor2d\j1scene.cpp(101): warning C4244: '+=': conversion from 'float' to 'int', possible loss of data
+d:\downloads\handout_7\dev_class11_handout2\motor2d\j1scene.cpp(104): warning C4244: '-=': conversion from 'float' to 'int', possible loss of data
+d:\downloads\handout_7\dev_class11_handout2\motor2d\j1scene.cpp(107): warning C4244: '+=': conversion from 'float' to 'int', possible loss of data
+d:\downloads\handout_7\dev_class11_handout2\motor2d\j1scene.cpp(110): warning C4244: '-=': conversion from 'float' to 'int', possible loss of data
+  Motor2D.vcxproj -> D:\Downloads\Handout_7\Dev_class11_handout2\Debug\Development - Class 11 Handout2.exe

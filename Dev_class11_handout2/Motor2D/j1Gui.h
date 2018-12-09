@@ -6,31 +6,31 @@
 #define CURSOR_WIDTH 2
 
 class _TTF_Font;
+
 // TODO 1: Create your structure of classes
 class j1UIElement
 {
-public:
+protected:
 	SDL_Rect rect_box;
 	SDL_Rect rect_sprite;
+public:
 	bool hovered = false;
 	bool interactable = false;
 	j1Scene* scene;
-	j1UIElement();
+	j1UIElement(j1UIElement* parent = nullptr);
 	~j1UIElement();
 	virtual bool UIBlit();
 	virtual bool UICleanUp();
 	virtual bool IsInside(int x, int y);
-};
 
-class j1UIInteractable : public j1UIElement
-{
-public:
-	SDL_Rect* anim;
-
-	virtual void OnMouseClick() {};
+	SDL_Rect GetScreenRect();
+	SDL_Rect GetLocalRect(); 
+	iPoint GetScreenPos();
+	iPoint GetLocalPos();	void SetLocalPos(int x, int y);	virtual void OnMouseClick() {};
 	virtual void OnMouseHover() {};
 	virtual void OnMouseRelease() {};
-	virtual void OnMouseExit() {};
+	virtual void OnMouseExit() {};
+	j1UIElement* parent = nullptr;
 };
 
 class j1UIImage : public j1UIElement
@@ -52,12 +52,13 @@ public:
 	bool UIBlit();
 	void SetText(p2SString text);
 };
-class j1UIButton : public j1UIInteractable
+class j1UIButton : public j1UIElement
 {
 public:
-	//j1UILabel label;
 	j1UIButton(iPoint pos);
 	~j1UIButton();
+
+	SDL_Rect* anim;
 
 	bool UIBlit();
 	void OnMouseClick();
@@ -92,9 +93,11 @@ public:
 
 	// TODO 2: Create the factory methods
 	// Gui creation functions
-	j1UIImage* CreateImage(iPoint pos, SDL_Rect rect, j1Scene* scene);
-	j1UILabel* CreateLabel(iPoint pos, p2SString path, int size, p2SString text, SDL_Color color, j1Scene* scene);
-	j1UIButton* CreateButton(iPoint pos, j1Scene* scene);
+	j1UIImage* CreateImage(iPoint pos, SDL_Rect rect, j1Scene* scene, j1UIElement* parent = nullptr);
+	j1UILabel* CreateLabel(iPoint pos, p2SString path, int size, p2SString text, SDL_Color color, j1Scene* scene, j1UIElement* parent = nullptr);
+	j1UIButton* CreateButton(iPoint pos, j1Scene* scene, j1UIElement* parent = nullptr);
+
+	j1UIElement* GetElementUnderMouse();
 	
 
 	SDL_Texture* GetAtlas() const;

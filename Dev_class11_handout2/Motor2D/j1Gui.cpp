@@ -36,32 +36,75 @@ bool j1Gui::Start()
 	return true;
 }
 
-// Update all guis
-bool j1Gui::PreUpdate()
+
+j1UIElement* j1Gui::GetElementUnderMouse()
 {
 	int x, y;
 	App->input->GetMousePosition(x, y);
+
+	for (p2List_item<j1UIElement*>* item = elements.start; item != NULL; item = item->next)
+	{
+		if (item->data->IsInside(x, y))
+		{
+			bool inside_child = false;
+			for (p2List_item<j1UIElement*>* child_item = elements.start; child_item != NULL; child_item = child_item->next)
+			{
+				if (child_item->data->parent && child_item->data->parent == item->data && child_item->data->IsInside(x, y))
+				{
+					inside_child = true;
+					break;
+				}
+			}
+			if (!inside_child)
+				return item->data;
+		}
+	}
+
+	return nullptr;
+}
+
+// Update all guis
+bool j1Gui::PreUpdate()
+{
+	j1UIElement* selected_element = GetElementUnderMouse();
+
 	for (p2List_item<j1UIElement*>* item = elements.start; item != NULL; item = item->next)
 	{
 		j1UIElement* current_element = item->data;
-		if (current_element->IsInside(x, y))
+		if (selected_element && selected_element == current_element)
 		{
 			if (!current_element->hovered) 
 			{
-				if (current_element->interactable) ((j1UIInteractable*)current_element)->OnMouseHover();
+				current_element->OnMouseHover();
 				current_element->scene->OnMouseHover(item->data);
 				current_element->hovered = true;
 			}
-			else if(App->input->GetMouseButtonDown(SDL_BUTTON_LEFT))
+			else
 			{
-				if (current_element->interactable) ((j1UIInteractable*)current_element)->OnMouseClick();
-				current_element->scene->OnMouseClick(item->data);
+				if (App->input->GetMouseButtonDown(SDL_BUTTON_LEFT))
+				{
+					current_element->OnMouseClick();
+					current_element->scene->OnMouseClick(item->data);
 
+					//drag
+					if (current_element->interactable)
+					{
+						iPoint pos = current_element->GetLocalPos();
+						int x_movement, y_movement;
+						App->input->GetMouseMotion(x_movement, y_movement);
+						current_element->SetLocalPos(pos.x + x_movement, pos.y + y_movement);
+					}
+				}
+				else
+				{
+					current_element->OnMouseRelease();
+					current_element->scene->OnMouseRelease(item->data);
+				}
 			}
 		}
 		else if(current_element->hovered)
 		{
-			if (current_element->interactable) ((j1UIInteractable*)current_element)->OnMouseExit();
+			current_element->OnMouseExit();
 			current_element->scene->OnMouseExit(item->data);
 			current_element->hovered = false;
 		}
@@ -87,30 +130,33 @@ bool j1Gui::CleanUp()
 	return true;
 }
 
-j1UIImage * j1Gui::CreateImage(iPoint pos, SDL_Rect rect, j1Scene* scene)
+j1UIImage * j1Gui::CreateImage(iPoint pos, SDL_Rect rect, j1Scene* scene, j1UIElement* parent)
 {
 	j1UIImage* image = new j1UIImage(pos, rect);
 	image->scene = scene;
+	image->parent = parent;
 	elements.add(image);
 
 	return image;
 }
 
-j1UILabel * j1Gui::CreateLabel(iPoint pos, p2SString path, int size, p2SString text, SDL_Color color, j1Scene* scene)
+j1UILabel * j1Gui::CreateLabel(iPoint pos, p2SString path, int size, p2SString text, SDL_Color color, j1Scene* scene, j1UIElement* parent)
 {
 	_TTF_Font* font = App->font->Load(path.GetString(), size);
 	j1UILabel* label = new j1UILabel(pos, font,text,color);
 	label->scene = scene;
+	label->parent = parent;
 	elements.add(label);
 
 
 	return label;
 }
 
-j1UIButton * j1Gui::CreateButton(iPoint pos, j1Scene * scene)
+j1UIButton * j1Gui::CreateButton(iPoint pos, j1Scene * scene, j1UIElement* parent)
 {
 	j1UIButton* button = new j1UIButton(pos);
 	button->scene = scene;
+	button->parent = parent;
 	elements.add(button);
 
 	return button;
@@ -124,8 +170,9 @@ SDL_Texture* j1Gui::GetAtlas() const
 
 // class Gui ---------------------------------------------------
 
-j1UIElement::j1UIElement()
+j1UIElement::j1UIElement(j1UIElement* parent)
 {
+	this->parent = parent;
 }
 
 j1UIElement::~j1UIElement()
@@ -144,7 +191,40 @@ bool j1UIElement::UICleanUp()
 
 bool j1UIElement::IsInside(int x, int y)
 {
-	return((x < rect_box.x + rect_box.w)&&(rect_box.x<x) && (y < rect_box.y + rect_box.h)&&(rect_box.y < y));
+	SDL_Rect screen_rect = GetScreenRect();
+	return((x < screen_rect.x + screen_rect.w)&&(screen_rect.x<x) && (y < screen_rect.y + screen_rect.h) && (screen_rect.y < y));
+}
+
+SDL_Rect j1UIElement::GetScreenRect()
+{
+	if (parent)
+		return { parent->GetScreenRect().x + rect_box.x, parent->GetScreenRect().y + rect_box.y, rect_box.w, rect_box.h };
+	else
+		return rect_box;
+}
+
+SDL_Rect j1UIElement::GetLocalRect()
+{
+	return rect_box;
+}
+
+iPoint j1UIElement::GetScreenPos()
+{
+	if (parent)
+		return { parent->GetScreenRect().x + rect_box.x, parent->GetScreenRect().y + rect_box.y };
+	else
+		return { rect_box.x, rect_box.y };
+}
+
+iPoint j1UIElement::GetLocalPos()
+{
+	return { rect_box.x, rect_box.y };
+}
+
+void j1UIElement::SetLocalPos(int x, int y)
+{
+	rect_box.x = x;
+	rect_box.y = y;
 }
 
 j1UIImage::j1UIImage(iPoint pos, SDL_Rect rect)
@@ -159,7 +239,8 @@ j1UIImage::~j1UIImage()
 
 bool j1UIImage::UIBlit()
 {
-	App->render->Blit(App->gui->GetAtlas(), rect_box.x, rect_box.y, &rect_sprite, 0.0F);
+	iPoint screen_pos = GetScreenPos();
+	App->render->Blit(App->gui->GetAtlas(), screen_pos.x, screen_pos.y, &rect_sprite, 0.0F);
 	return true;
 }
 
@@ -178,8 +259,9 @@ j1UILabel::~j1UILabel()
 
 bool j1UILabel::UIBlit()
 {
+	iPoint screen_pos = GetScreenPos();
 	SDL_Texture* texture = App->font->Print(text.GetString(), color, font);
-	App->render->Blit(texture, rect_box.x, rect_box.y, nullptr, 0.0F);
+	App->render->Blit(texture, screen_pos.x, screen_pos.y, nullptr, 0.0F);
 	SDL_DestroyTexture(texture);
 	return true;
 }
@@ -197,7 +279,8 @@ j1UIButton::~j1UIButton()
 
 bool j1UIButton::UIBlit()
 {
-	App->render->Blit(App->gui->GetAtlas(), rect_box.x, rect_box.y, &rect_sprite, 0.0F);
+	iPoint screen_pos = GetScreenPos();
+	App->render->Blit(App->gui->GetAtlas(), screen_pos.x, screen_pos.y, &rect_sprite, 0.0F);
 	return true;
 }
 
@@ -223,7 +306,6 @@ void j1UIButton::OnMouseExit()
 
 j1UIButton::j1UIButton(iPoint position)
 {
-	interactable = true;
 	rect_box = { position.x, position.y, 229,69 };
 	anim = new SDL_Rect[3];
 	anim[0] = { 0,113,229,69 };

@@ -45,9 +45,12 @@ bool j1Scene::Start()
 	debug_tex = App->tex->Load("maps/path2.png");
 
 	// TODO 3: Create the banner (rect {485, 829, 328, 103}) and the text "Hello World"
-	banner = App->gui->CreateImage({ 300,300 }, { 485, 829, 328, 103 },this);
-	button = App->gui->CreateButton({ 400,600 }, this);
-	text = App->gui->CreateLabel({ 418, 260 }, "fonts/open_sans/OpenSans-Regular.ttf", 18, "Hello World", { 255,255,255 },this);
+	banner = App->gui->CreateImage({ 150,150 }, { 0, 512, 483, 512 }, this);
+	button = App->gui->CreateButton({ 100, 250 }, this, banner);
+	banner->interactable = true;
+	button->interactable = true;
+	window_title = App->gui->CreateLabel({ 200, 50 }, "fonts/open_sans/OpenSans-Regular.ttf", 18, "Window Title", { 255,255,255 }, this, banner);
+	text = App->gui->CreateLabel({ 50, 15 }, "fonts/open_sans/OpenSans-Regular.ttf", 18, "Hello World", { 255,255,255 },this, button);
 
 	return true;
 }

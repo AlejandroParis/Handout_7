@@ -45,6 +45,7 @@ private:
 	SDL_Texture* debug_tex;
 	j1UIImage* banner;
 	j1UILabel* text;
+	j1UILabel* window_title;
 	j1UIButton* button;
 };
 
