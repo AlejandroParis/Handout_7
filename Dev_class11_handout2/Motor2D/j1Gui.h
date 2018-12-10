@@ -7,6 +7,15 @@
 
 class _TTF_Font;
 
+enum GUI_Event {
+	LEFT_CLICK_DOWN,
+	LEFT_CLICK_UP,
+	MOUSE_OVER,
+	MOUSE_EXIT
+};
+
+
+
 // TODO 1: Create your structure of classes
 class j1UIElement
 {
@@ -16,7 +25,6 @@ protected:
 public:
 	bool hovered = false;
 	bool interactable = false;
-	j1Scene* scene;
 	j1UIElement(j1UIElement* parent = nullptr);
 	~j1UIElement();
 	virtual bool UIBlit();
@@ -26,10 +34,14 @@ public:
 	SDL_Rect GetScreenRect();
 	SDL_Rect GetLocalRect(); 
 	iPoint GetScreenPos();
-	iPoint GetLocalPos();	void SetLocalPos(int x, int y);	virtual void OnMouseClick() {};
+	iPoint GetLocalPos();
+	void SetLocalPos(int x, int y);
+
+	virtual void OnMouseClick() {};
 	virtual void OnMouseHover() {};
 	virtual void OnMouseRelease() {};
-	virtual void OnMouseExit() {};
+	virtual void OnMouseExit() {};
+
 	j1UIElement* parent = nullptr;
 };
 
@@ -93,9 +105,9 @@ public:
 
 	// TODO 2: Create the factory methods
 	// Gui creation functions
-	j1UIImage* CreateImage(iPoint pos, SDL_Rect rect, j1Scene* scene, j1UIElement* parent = nullptr);
-	j1UILabel* CreateLabel(iPoint pos, p2SString path, int size, p2SString text, SDL_Color color, j1Scene* scene, j1UIElement* parent = nullptr);
-	j1UIButton* CreateButton(iPoint pos, j1Scene* scene, j1UIElement* parent = nullptr);
+	j1UIImage* CreateImage(iPoint pos, SDL_Rect rect, j1UIElement* parent = nullptr);
+	j1UILabel* CreateLabel(iPoint pos, p2SString path, int size, p2SString text, SDL_Color color, j1UIElement* parent = nullptr);
+	j1UIButton* CreateButton(iPoint pos, j1UIElement* parent = nullptr);
 
 	j1UIElement* GetElementUnderMouse();
 	

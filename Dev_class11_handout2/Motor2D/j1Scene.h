@@ -4,10 +4,12 @@
 #include "j1Module.h"
 
 struct SDL_Texture;
+enum GUI_Event;
 class j1UIImage;
 class j1UILabel;
 class j1UIElement;
 class j1UIButton;
+
 
 class j1Scene : public j1Module
 {
@@ -36,10 +38,7 @@ public:
 	// Called before quitting
 	bool CleanUp();
 
-	bool OnMouseClick(j1UIElement* element);
-	bool OnMouseHover(j1UIElement* element);
-	bool OnMouseRelease(j1UIElement* element);
-	bool OnMouseExit(j1UIElement* element);
+	bool GUIEvent(j1UIElement* element, GUI_Event gui_event);
 
 private:
 	SDL_Texture* debug_tex;

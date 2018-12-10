@@ -76,7 +76,7 @@ bool j1Gui::PreUpdate()
 			if (!current_element->hovered) 
 			{
 				current_element->OnMouseHover();
-				current_element->scene->OnMouseHover(item->data);
+				App->scene->GUIEvent(current_element, MOUSE_OVER);
 				current_element->hovered = true;
 			}
 			else
@@ -84,7 +84,7 @@ bool j1Gui::PreUpdate()
 				if (App->input->GetMouseButtonDown(SDL_BUTTON_LEFT))
 				{
 					current_element->OnMouseClick();
-					current_element->scene->OnMouseClick(item->data);
+					App->scene->GUIEvent(current_element, LEFT_CLICK_DOWN);
 
 					//drag
 					if (current_element->interactable)
@@ -98,14 +98,14 @@ bool j1Gui::PreUpdate()
 				else
 				{
 					current_element->OnMouseRelease();
-					current_element->scene->OnMouseRelease(item->data);
+					App->scene->GUIEvent(current_element, LEFT_CLICK_UP);
 				}
 			}
 		}
 		else if(current_element->hovered)
 		{
 			current_element->OnMouseExit();
-			current_element->scene->OnMouseExit(item->data);
+			App->scene->GUIEvent(current_element, MOUSE_EXIT);
 			current_element->hovered = false;
 		}
 	}
@@ -130,21 +130,19 @@ bool j1Gui::CleanUp()
 	return true;
 }
 
-j1UIImage * j1Gui::CreateImage(iPoint pos, SDL_Rect rect, j1Scene* scene, j1UIElement* parent)
+j1UIImage * j1Gui::CreateImage(iPoint pos, SDL_Rect rect, j1UIElement* parent)
 {
 	j1UIImage* image = new j1UIImage(pos, rect);
-	image->scene = scene;
 	image->parent = parent;
 	elements.add(image);
 
 	return image;
 }
 
-j1UILabel * j1Gui::CreateLabel(iPoint pos, p2SString path, int size, p2SString text, SDL_Color color, j1Scene* scene, j1UIElement* parent)
+j1UILabel * j1Gui::CreateLabel(iPoint pos, p2SString path, int size, p2SString text, SDL_Color color, j1UIElement* parent)
 {
 	_TTF_Font* font = App->font->Load(path.GetString(), size);
 	j1UILabel* label = new j1UILabel(pos, font,text,color);
-	label->scene = scene;
 	label->parent = parent;
 	elements.add(label);
 
@@ -152,10 +150,9 @@ j1UILabel * j1Gui::CreateLabel(iPoint pos, p2SString path, int size, p2SString t
 	return label;
 }
 
-j1UIButton * j1Gui::CreateButton(iPoint pos, j1Scene * scene, j1UIElement* parent)
+j1UIButton * j1Gui::CreateButton(iPoint pos, j1UIElement* parent)
 {
 	j1UIButton* button = new j1UIButton(pos);
-	button->scene = scene;
 	button->parent = parent;
 	elements.add(button);
 
